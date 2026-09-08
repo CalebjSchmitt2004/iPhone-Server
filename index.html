@@ -1,0 +1,851 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARM Linux Server - On iPhone XR</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-obsidian: #0a0a0c;
+            --text-white: #f5f5f7;
+            --ubuntu-green: #4ae352;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-blur: blur(30px);
+            --wallpaper-url: url('https://www.droidviews.com/wp-content/uploads/2018/09/iPhone-XR-Wallpaper-Droidviews-01.png');
+            --ios-blue: #007aff;
+            --accent-purple: #bf5af2;
+            --accent-pink: #ff2d55;
+            --ios-gray: #1c1c1e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html {
+            width: 100%; height: 100%;
+            background: black; color: var(--text-white);
+            font-family: 'Inter', sans-serif; overflow: hidden;
+        }
+        /* --- BOOT SEQUENCE --- */
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        #apple-logo {
+            width: 100px; height: auto;
+            filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255,255,255,0.5));
+            animation: pulse 2s infinite ease-in-out;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1); } }
+        #console {
+            display: none; width: 95%; max-width: 1000px;
+            font-family: 'JetBrains Mono', monospace; font-size: 11px;
+            color: var(--text-white); text-align: left;
+            height: 90vh; overflow: hidden;
+        }
+        .line { margin-bottom: 2px; opacity: 0; transition: opacity 0.05s; }
+        .line.visible { opacity: 1; }
+        .ok-bar { color: var(--ubuntu-green); font-weight: bold; }
+        
+        /* --- VIRTUAL IPHONE --- */
+        #virtual-phone-container {
+            display: none; height: 100vh; width: 100vw;
+            background: var(--deep-obsidian);
+            justify-content: center; align-items: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .iphone-frame {
+            width: 375px; height: 812px;
+            background: #000; border-radius: 55px;
+            border: 13px solid #2c2c2e; position: relative;
+            box-shadow: 0 0 0 2px #1c1c1e, 0 50px 100px rgba(0,0,0,0.9);
+            overflow: hidden;
+            animation: phoneEntrance 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes phoneEntrance { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 160px; height: 30px; background: #000;
+            border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;
+            z-index: 1000;
+        }
+        .screen {
+            width: 100%; height: 100%;
+            background: var(--wallpaper-url) center/cover no-repeat;
+            position: relative; padding: 45px 25px;
+            display: flex; flex-direction: column;
+        }
+        .status-bar {
+            position: absolute;
+            top: 11px; left: 0; right: 0;
+            display: flex; justify-content: space-between;
+            align-items: center; font-size: 12px; font-weight: 600;
+            z-index: 999; padding: 0 25px;
+        }
+
+        /* --- HOME SCREEN --- */
+        #home-screen {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            transition: transform 0.4s ease, opacity 0.3s;
+        }
+        .widget-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;
+            margin-top: 20px;
+        }
+        .glass-widget {
+            height: 150px; background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 15px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .widget-title { font-size: 12px; opacity: 0.7; }
+        .widget-value { font-size: 28px; font-weight: 700; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .app-icon {
+            display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .app-icon:active { transform: scale(0.85); }
+        .icon-shape {
+            width: 60px; height: 60px; border-radius: 16px;
+            margin-bottom: 6px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 0.5px solid rgba(255,255,255,0.2);
+            background-repeat: no-repeat; background-size: cover;
+        }
+        .app-name { font-size: 11px; color: white; text-align: center; font-weight: 500; }
+
+        .dock {
+            position: absolute; bottom: 25px; left: 15px; right: 15px;
+            height: 90px; background: rgba(255,255,255,0.2);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px; display: flex; justify-content: space-around; align-items: center;
+            padding: 0 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 10; transition: opacity 0.3s ease;
+        }
+        .dock .app-icon { flex: 1; display: flex; justify-content: center; }
+        .dock .app-name { display: none; }
+
+        /* --- APP LAYER SYSTEM --- */
+        .app-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--deep-obsidian); z-index: 1100;
+            display: none; flex-direction: column;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        .app-header {
+            padding: 55px 20px 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(28, 28, 30, 0.8); backdrop-filter: var(--glass-blur);
+            color: white; font-weight: 700; font-size: 22px;
+            border-bottom: 0.5px solid rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+
+        /* --- PHOTOS APP REDESIGN --- */
+        .photos-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 3px; padding: 3px; overflow-y: auto; height: calc(100% - 75px);
+        }
+        .photo-item { width: 100%; aspect-ratio: 1; background-size: cover; background-position: center; cursor: pointer; transition: opacity 0.2s; }
+        .photo-item:active { opacity: 0.6; }
+        .photo-viewer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 1300; display: none; flex-direction: column;
+        }
+        .viewer-img { width: 100%; height: 100%; object-fit: contain; }
+        .viewer-back {
+            position: absolute; top: 50px; left: 20px;
+            background: rgba(255,255,255,0.2); color: white; padding: 8px 15px; border-radius: 20px;
+            cursor: pointer; font-size: 14px; z-index: 1400; backdrop-filter: var(--glass-blur); border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* --- PHONE APP REDESIGN --- */
+        .phone-container { height: 100%; display: flex; flex-direction: column; }
+        .phone-display {
+            text-align: center; font-size: 36px; font-weight: 300; padding: 40px 20px;
+            min-height: 120px; display: flex; align-items: center; justify-content: center;
+        }
+        .dialpad {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+            padding: 20px 40px; justify-items: center;
+        }
+        .dial-btn {
+            width: 75px; height: 75px; background: rgba(255,255,255,0.08); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .dial-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
+        .call-btn { background: var(--ubuntu-green); color: white; box-shadow: 0 0 20px rgba(74, 227, 82, 0.4); }
+        .call-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #2c2c2e, #000); z-index: 1400; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .call-status { font-size: 28px; margin-bottom: 60px; text-align: center; font-weight: 400; }
+        .end-call {
+            width: 80px; height: 80px; background: #ff3b30; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; font-size: 30px; box-shadow: 0 0 30px rgba(255, 59, 48, 0.5);
+        }
+
+        /* --- MESSAGES APP REDESIGN --- */
+        .msg-list { overflow-y: auto; height: calc(100% - 75px); }
+        .msg-item {
+            display: flex; padding: 15px; border-bottom: 0.5px solid rgba(255,255,255,0.05);
+            cursor: pointer; align-items: center; transition: background 0.2s;
+        }
+        .msg-item:active { background: rgba(255,255,255,0.05); }
+        .avatar {
+            width: 55px; height: 55px; border-radius: 50%; background: #555;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: 600; font-size: 20px; margin-right: 15px;
+        }
+        .msg-preview { flex: 1; }
+        .msg-name { font-weight: 600; font-size: 17px; margin-bottom: 2px; }
+        .msg-text { font-size: 14px; opacity: 0.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-view {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 1300; display: none; flex-direction: column;
+        }
+        .chat-messages {
+            flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 12px;
+            overflow-y: auto;
+        }
+        .bubble {
+            max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 16px;
+            line-height: 1.4;
+        }
+        .bubble.me { background: var(--ios-blue); align-self: flex-end; color: white; border-bottom-right-radius: 4px; }
+        .bubble.them { background: #262629; align-self: flex-start; color: white; border-bottom-left-radius: 4px; }
+
+        /* --- SAFARI APP REDESIGN --- */
+        .safari-bar {
+            padding: 55px 15px 15px; background: rgba(28, 28, 30, 0.8);
+            backdrop-filter: var(--glass-blur); display: flex; gap: 10px;
+        }
+        .url-input {
+            flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 10px 15px; color: white; font-size: 15px;
+        }
+        .go-btn { background: var(--ios-blue); padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+        .browser-content {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center; padding: 20px;
+        }
+        .loader {
+            width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid white;
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+            display: none;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- SPOTIFY APP REDESIGN --- */
+        #spotify-app { background: #000; }
+        .spotify-player {
+            height: 100%; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 40px;
+            background: linear-gradient(to bottom, #1db95433, #000);
+        }
+        .album-art {
+            width: 280px; height: 280px; border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            margin-bottom: 40px; transition: transform 0.5s ease;
+        }
+        .album-art.rotating { animation: rotateArt 12s linear infinite; }
+        @keyframes rotateArt { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .track-info { text-align: center; margin-bottom: 30px; }
+        .track-name { font-size: 26px; font-weight: 700; margin-bottom: 5px; }
+        .track-artist { opacity: 0.6; font-size: 18px; }
+        .progress-bar {
+            width: 100%; height: 6px; background: #333;
+            border-radius: 3px; margin-bottom: 40px; position: relative;
+        }
+        .progress-fill { width: 35%; height: 100%; background: #1db954; border-radius: 3px; box-shadow: 0 0 10px #1db954; }
+        .controls { display: flex; align-items: center; gap: 40px; }
+        .play-btn {
+            width: 70px; height: 70px; background: white; color: black;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 28px; cursor: pointer; box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        /* --- THE FULL SCREEN ABOUT PAGE --- */
+        #about-full-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--deep-obsidian);
+            z-index: 10000;
+            display: none; flex-direction: column;
+            opacity: 0; transform: scale(1.1);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow-x: hidden;
+        }
+        #about-full-screen.active { opacity: 1; transform: scale(1); }
+        
+        .blob {
+            position: absolute; width: 600px; height: 600px;
+            filter: blur(100px); border-radius: 50%; z-index: -1;
+            opacity: 0.3; animation: moveBlob 25s infinite alternate;
+        }
+        .blob-1 { background: var(--ios-blue); top: -100px; left: -100px; }
+        .blob-2 { background: var(--accent-purple); bottom: -100px; right: -100px; animation-delay: -5s; }
+        .blob-3 { background: var(--accent-pink); top: 30%; left: 40%; animation-delay: -10s; }
+        @keyframes moveBlob {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(150px, 150px) scale(1.3); }
+        }
+
+        .about-header {
+            position: sticky; top: 0; width: 100%;
+            height: 80px; background: rgba(10, 10, 12, 0.6);
+            backdrop-filter: var(--glass-blur);
+            display: flex; justify-content: center; align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 100;
+        }
+        .back-btn {
+            padding: 12px 30px; background: white; color: black;
+            border-radius: 30px; cursor: pointer; font-weight: 700;
+            transition: all 0.3s ease; border: none; font-family: 'Inter', sans-serif;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+        .back-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255,255,255,0.5); }
+
+        .about-content {
+            max-width: 1100px; margin: 60px auto; padding: 0 40px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
+            animation: slideUp 0.8s ease forwards;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px; padding: 40px;
+            line-height: 1.7; font-size: 18px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease, border 0.3s ease;
+        }
+        .glass-card:hover { transform: translateY(-5px); border-color: rgba(255, 255, 255, 0.4); }
+        .about-title {
+            font-size: 54px; font-weight: 800; margin-bottom: 30px;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: -2px; grid-column: span 2; text-align: center;
+        }
+        .highlight { color: var(--ubuntu-green); font-weight: 700; text-shadow: 0 0 15px rgba(74, 227, 82, 0.4); }
+
+        /* --- GLOBAL ELEMENTS --- */
+        .home-bar {
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 5px; background: white; border-radius: 10px;
+            opacity: 0.8; z-index: 2000; cursor: pointer;
+        }
+    </style>
+</head>
+<body onload="runBootSequence()">
+    <div id="boot-screen">
+        <img id="apple-logo" src="https://s3-figma-hubfile-images-production-cdn-cgi.figma.com/cdn-cgi/image/format=auto,quality=85/hub/file/carousel/img/572a2b3af70a102c39cdd2acf192cdf409269080/2e31781005496300d3bc8f571c478af97efbd51a" alt="Apple Logo">
+        <div id="console"></div>
+    </div>
+    <div id="virtual-phone-container">
+        <div class="iphone-frame">
+            <div class="notch"></div>
+            <div class="screen">
+                <div class="status-bar">
+                    <div class="status-left"><span id="status-time">2:50 PM</span></div>
+                    <div class="status-right"><span>iPhone XR</span></div>
+                </div>
+                <div id="home-screen">
+                    <div class="widget-row">
+                        <div class="glass-widget">
+                            <span class="widget-title">Weather</span>
+                            <span class="widget-value">79°</span>
+                            <span style="font-size:10px">Fort Wayne, IN</span>
+                        </div>
+                        <div class="glass-widget">
+                            <span class="widget-title">Calendar</span>
+                            <span class="widget-value" id="widget-date">Sun 6</span>
+                            <span style="font-size:10px">No Events Today</span>
+                        </div>
+                    </div>
+                    <div class="app-grid">
+                        <div class="app-icon" onclick="openApp('FaceTime')">
+                            <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/facetime-2025-10-20.png');"></div>
+                            <div class="app-name">FaceTime</div>
+                        </div>
+                        <div class="app-icon" onclick="openApp('Calendar')">
+                            <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/calendar-2025-10-20.png');"></div>
+                            <div class="app-name">Calendar</div>
+                        </div>
+                        <div class="app-icon" onclick="openApp('Photos')">
+                            <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/photos-2025-10-20.png');"></div>
+                            <div class="app-name">Photos</div>
+                        </div>
+                        <div class="app-icon" onclick="openApp('Camera')">
+                            <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/camera-2025-10-20.png');"></div>
+                            <div class="app-name">Camera</div>
+                        </div>
+                        <div class="app-icon" onclick="openApp('Mail')">
+                            <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/mail-2025-10-20.png');"></div>
+                            <div class="app-name">Mail</div>
+                        </div>
+                        <div class="app-icon" onclick="openApp('Notes')">
+                            <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/notes-2025-10-20.png');"></div>
+                            <div class="app-name">Notes</div>
+                        </div>
+                        <div class="app-icon" onclick="openApp('Spotify')">
+                            <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/spotify-for-artists-2019-08-26.png');"></div>
+                            <div class="app-name">Spotify</div>
+                        </div>
+                        <div class="app-icon" onclick="openApp('About')">
+                            <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/image-playground-2025-10-27.png');"></div>
+                            <div class="app-name">About</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dock" id="main-dock">
+                    <div class="app-icon" onclick="openApp('Phone')">
+                        <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/phone-2023-10-05.png');"></div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('Safari')">
+                        <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/safari-2025-10-20.png');"></div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('Messages')">
+                        <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/messages-2025-10-20.png');"></div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('Music')">
+                        <div class="icon-shape" style="background-image: url('https://cdn.jim-nielsen.com/ios/512/apple-music-2025-10-20.png');"></div>
+                    </div>
+                </div>
+                <div id="photos-app" class="app-layer">
+                    <div class="app-header">Library</div>
+                    <div class="photos-grid" id="photos-grid"></div>
+                    <div class="photo-viewer" id="photo-viewer">
+                        <div class="viewer-back" onclick="closePhoto(event)">〈 Back</div>
+                        <img src="" class="viewer-img" id="viewer-img">
+                    </div>
+                </div>
+                <div id="phone-app" class="app-layer">
+                    <div class="app-header">Phone</div>
+                    <div class="phone-container">
+                        <div class="phone-display" id="phone-num"></div>
+                        <div class="dialpad">
+                            <div class="dial-btn" onclick="pressDial('1')">1</div>
+                            <div class="dial-btn" onclick="pressDial('2')">2</div>
+                            <div class="dial-btn" onclick="pressDial('3')">3</div>
+                            <div class="dial-btn" onclick="pressDial('4')">4</div>
+                            <div class="dial-btn" onclick="pressDial('5')">5</div>
+                            <div class="dial-btn" onclick="pressDial('6')">6</div>
+                            <div class="dial-btn" onclick="pressDial('7')">7</div>
+                            <div class="dial-btn" onclick="pressDial('8')">8</div>
+                            <div class="dial-btn" onclick="pressDial('9')">9</div>
+                            <div class="dial-btn" onclick="pressDial('*')">*</div>
+                            <div class="dial-btn" onclick="pressDial('0')">0</div>
+                            <div class="dial-btn" onclick="pressDial('#')">#</div>
+                            <div></div>
+                            <div class="dial-btn call-btn" onclick="startCall()">📞</div>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div class="call-screen" id="call-screen">
+                        <div class="call-status" id="call-status">Calling...</div>
+                        <div class="end-call" onclick="endCall()">📞</div>
+                    </div>
+                </div>
+                <div id="messages-app" class="app-layer">
+                    <div class="app-header">Messages</div>
+                    <div class="msg-list" id="msg-list"></div>
+                    <div class="chat-view" id="chat-view">
+                        <div class="app-header" style="justify-content: space-between;">
+                            <span id="chat-name">Contact</span>
+                            <span style="cursor:pointer; font-size:14px;" onclick="closeChat()">〈 Back</span>
+                        </div>
+                        <div class="chat-messages" id="chat-messages"></div>
+                    </div>
+                </div>
+                <div id="safari-app" class="app-layer">
+                    <div class="safari-bar">
+                        <input type="text" class="url-input" id="safari-url" value="google.com">
+                        <div class="go-btn" onclick="safariGo()">Go</div>
+                    </div>
+                    <div class="browser-content">
+                        <div class="loader" id="safari-loader"></div>
+                        <div id="safari-text">Enter a URL and press Go</div>
+                    </div>
+                </div>
+                <div id="music-app" class="app-layer">
+                    <div class="app-header">Apple Music</div>
+                    <div style="flex:1; display:flex; align-items:center; justify-content:center; text-align:center; padding:30px; font-size:18px;">
+                        You look lost... did you mean to hit Spotify?
+                        <div style="margin-top:20px; color:var(--ios-blue); cursor:pointer; font-weight:bold;" onclick="openApp('Spotify')">Open Spotify →</div>
+                    </div>
+                </div>
+                <div id="spotify-app" class="app-layer">
+                    <div class="app-header" style="background:#000">Spotify</div>
+                    <div class="spotify-player">
+                        <img src="https://picsum.photos/id/123/300/300" class="album-art" id="spotify-art">
+                        <div class="track-info">
+                            <div class="track-name">Random Beats</div>
+                            <div class="track-artist">Virtual Artist</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="controls">
+                            <div style="font-size:24px; cursor:pointer;">⏮</div>
+                            <div class="play-btn" id="spot-play" onclick="toggleSpotify()">▶</div>
+                            <div style="font-size:24px; cursor:pointer;">⏭</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="generic-app" class="app-layer">
+                    <div class="app-header" id="generic-app-name">App</div>
+                    <div id="generic-content" class="basic-app-content" style="padding: 80px 20px; text-align: center;">Application simulation in progress...</div>
+                </div>
+                <div class="home-bar" id="global-home-bar"></div>
+            </div>
+        </div>
+    </div>
+    <!-- FULL SCREEN ABOUT PAGE -->
+    <div id="about-full-screen">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="about-header">
+            <button class="back-btn" onclick="closeAbout()">Back to iPhone</button>
+        </div>
+        <div class="about-content">
+            <h1 class="about-title">About this Device</h1>
+            <div class="glass-card" style="grid-column: span 2; margin-bottom: 30px;">
+                <p>This simulation is running on a virtualized <span class="highlight">iPhone XR</span>, which has been modified to run the latest version of <span class="highlight">Debian Linux</span>.</p>
+                <br>
+                <p>Under the hood, the physical hardware consists of a <span class="highlight">6-core A12 Bionic chip</span> with <span class="highlight">3 GB of LPDDR4X memory</span>.</p>
+            </div>
+            <div class="glass-card">
+                <h3 style="margin-bottom:15px; font-size:24px;">VM Constraints</h3>
+                <p>Due to Apple's strict background application policies, the VM instance hosting this iPhone server is limited to <span class="highlight">2 CPU cores</span> and <span class="highlight">1024 MB (1 GB) of memory</span>.</p>
+            </div>
+            <div class="glass-card">
+                <h3 style="margin-bottom:15px; font-size:24px;">The Result</h3>
+                <p>Despite these constraints, this setup continues to function as a <span class="highlight">mighty web server</span>. In fact, this entire website you are currently viewing is being hosted directly from this iPhone XR VM.</p>
+            </div>
+            <div class="glass-card" style="grid-column: span 2;">
+                <h3 style="margin-bottom:15px; font-size:24px;">Architecture</h3>
+                <p>The entire front-end code base was written purely in <span class="highlight">HTML, CSS, and JavaScript</span>, with all assets and images being pulled dynamically from the internet. No external frameworks were used to ensure maximum compatibility with the VM's limited resources.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        const bootLogs = [
+            { s: "OK", m: "Initializing ARM v8.2-A boot sequence..." },
+            { s: "OK", m: "Loading bootloader from /dev/nvme0n1p1..." },
+            { s: "OK", m: "Checking memory integrity: 1024MB LPDDR4X" },
+            { s: "OK", m: "Kernel version 5.15.0-XR-VM-OBSIDIAN" },
+            { s: "OK", m: "Mounting rootfs on /dev/nvme0n1p2 (ext4)..." },
+            { s: "OK", m: "Starting systemd-journald.service..." },
+            { s: "OK", m: "Starting Network Manager..." },
+            { s: "OK", m: "Starting sshd.service [SSH Server]..." },
+            { s: "OK", m: "Starting apache2.service [Web Server]..." },
+            { s: "OK", m: "Initializing virtual-gpu-driver-v2.4..." },
+            { s: "OK", m: "Loading kernel modules: usbcore, bcm_wifi, apple_smc..." },
+            { s: "WARN", m: "Thermal throttle alert: CPU at 42C" },
+            { s: "OK", m: "Starting iOS-Simulator-Engine v27.0" },
+            { s: "OK", m: "Initializing SpringBoard Liquid Glass services..." },
+            { s: "OK", m: "Loading home-screen layout.json..." },
+            { s: "INFO", m: "User: guest_admin logged in" },
+            { s: "OK", m: "Launching Graphical Interface..." },
+            { s: "OK", m: "Boot sequence complete. Handoff to UI." }
+        ];
+        const photoLibrary = [
+            'https://picsum.photos/id/10/400/400', 'https://picsum.photos/id/20/400/400',
+            'https://picsum.photos/id/30/400/400', 'https://picsum.photos/id/40/400/400',
+            'https://picsum.photos/id/50/400/400', 'https://picsum.photos/id/60/400/400',
+            'https://picsum.photos/id/70/400/400', 'https://picsum.photos/id/80/400/400',
+            'https://picsum.photos/id/90/400/400', 'https://picsum.photos/id/100/400/400',
+            'https://picsum.photos/id/110/400/400', 'https://picsum.photos/id/120/400/400'
+        ];
+        let currentApp = null;
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById('status-time').innerText = `${hours}:${minutes} ${ampm}`;
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            document.getElementById('widget-date').innerText = `${days[now.getDay()]} ${now.getDate()}`;
+        }
+        async function runBootSequence() {
+            try {
+                const logo = document.getElementById('apple-logo');
+                const consoleDiv = document.getElementById('console');
+                const bootScreen = document.getElementById('boot-screen');
+                const phoneContainer = document.getElementById('virtual-phone-container');
+                
+                await new Promise(r => setTimeout(r, 2000));
+                logo.style.display = 'none';
+                consoleDiv.style.display = 'block';
+                
+                for (let log of bootLogs) {
+                    const line = document.createElement('div');
+                    line.className = 'line';
+                    line.innerHTML = `<span class="ok-bar">[ ${log.s} ]</span> ${log.m}`;
+                    consoleDiv.appendChild(line);
+                    await new Promise(r => setTimeout(r, 15));
+                    line.classList.add('visible');
+                    await new Promise(r => setTimeout(r, Math.random() * 80 + 20));
+                }
+                
+                await new Promise(r => setTimeout(r, 1000));
+                bootScreen.style.transition = 'opacity 0.8s ease';
+                bootScreen.style.opacity = '0';
+                
+                setTimeout(() => {
+                    bootScreen.style.display = 'none';
+                    phoneContainer.style.display = 'flex';
+                    setInterval(updateClock, 1000);
+                    updateClock();
+                    initPhotosApp();
+                    initMessagesApp();
+                }, 800);
+            } catch (e) {
+                document.getElementById('boot-screen').style.display = 'none';
+                document.getElementById('virtual-phone-container').style.display = 'flex';
+            }
+        }
+        function openApp(appName) {
+            if (currentApp) {
+                const prevApp = document.getElementById(currentApp);
+                prevApp.style.display = 'none';
+                prevApp.style.transform = 'translateY(0)';
+            }
+            if (appName === 'About') {
+                openAbout();
+                return;
+            }
+            const appMap = {
+                'Photos': 'photos-app',
+                'Phone': 'phone-app',
+                'Messages': 'messages-app',
+                'Safari': 'safari-app',
+                'Music': 'music-app',
+                'Spotify': 'spotify-app'
+            };
+            const appId = appMap[appName] || 'generic-app';
+            currentApp = appId;
+            if (appId === 'generic-app') {
+                document.getElementById('generic-app-name').innerText = appName;
+                updateGenericContent(appName);
+            }
+            const appEl = document.getElementById(appId);
+            appEl.style.display = 'flex';
+            document.getElementById('home-screen').style.opacity = '0';
+            document.getElementById('home-screen').style.transform = 'scale(0.9)';
+            document.getElementById('main-dock').style.opacity = '0';
+        }
+        function openAbout() {
+            const container = document.getElementById('virtual-phone-container');
+            const aboutPage = document.getElementById('about-full-screen');
+            
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.8)';
+            
+            aboutPage.style.display = 'flex';
+            setTimeout(() => aboutPage.classList.add('active'), 10);
+            currentApp = 'about-app';
+        }
+        function closeAbout() {
+            const container = document.getElementById('virtual-phone-container');
+            const aboutPage = document.getElementById('about-full-screen');
+            
+            aboutPage.classList.remove('active');
+            setTimeout(() => {
+                aboutPage.style.display = 'none';
+                container.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+                currentApp = null;
+            }, 500);
+        }
+        function closeCurrentApp() {
+            if (!currentApp) return;
+            if (currentApp === 'about-app') {
+                closeAbout();
+                return;
+            }
+            const appEl = document.getElementById(currentApp);
+            appEl.style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                appEl.style.display = 'none';
+                appEl.style.transform = 'translateY(0)';
+                document.getElementById('home-screen').style.opacity = '1';
+                document.getElementById('home-screen').style.transform = 'scale(1)';
+                document.getElementById('main-dock').style.opacity = '1';
+                currentApp = null;
+                closePhoto();
+                closeChat();
+            }, 400);
+        }
+        function updateGenericContent(appName) {
+            const content = document.getElementById('generic-content');
+            if (appName === 'FaceTime') {
+                content.innerHTML = `<div style="font-size:18px; opacity:0.7;">No one is available to FaceTime right now.</div>`;
+            } else if (appName === 'Calendar') {
+                content.innerHTML = `<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:5px; font-size:12px;">
+                    ${Array.from({length:31}, (_,i)=>`<div>${i+1}</div>`).join('')}
+                </div><div style="margin-top:20px; opacity:0.6;">No events scheduled.</div>`;
+            } else if (appName === 'Camera') {
+                content.innerHTML = `<div class="camera-view"><div style="color:#444; font-size:20px;">Viewfinder Active</div><div class="shutter-btn" onclick="alert('Photo Captured!')"></div></div>`;
+                content.style.padding = "0";
+            } else if (appName === 'Mail') {
+                content.innerHTML = `<div style="text-align:left; opacity:0.6;">Inbox<br><br>No new mail.</div>`;
+            } else if (appName === 'Notes') {
+                content.innerHTML = `<div style="text-align:left; opacity:0.6;">My Notes<br>1. Buy Milk<br>2. Build an iPhone Linux Server<br>3. Get some sleep</div>`;
+            } else {
+                content.innerText = "Application simulation in progress...";
+            }
+        }
+        function initPhotosApp() {
+            const grid = document.getElementById('photos-grid');
+            grid.innerHTML = '';
+            photoLibrary.forEach(url => {
+                const div = document.createElement('div');
+                div.className = 'photo-item';
+                div.style.backgroundImage = `url(${url})`;
+                div.onclick = (e) => { e.stopPropagation(); openPhoto(url); };
+                grid.appendChild(div);
+            });
+        }
+        function openPhoto(url) {
+            document.getElementById('viewer-img').src = url;
+            document.getElementById('photo-viewer').style.display = 'flex';
+        }
+        function closePhoto(e) {
+            if (e) e.stopPropagation();
+            document.getElementById('photo-viewer').style.display = 'none';
+        }
+        let phoneNum = "";
+        function pressDial(val) {
+            phoneNum += val;
+            document.getElementById('phone-num').innerText = phoneNum;
+        }
+        function startCall() {
+            if (!phoneNum) return;
+            const screen = document.getElementById('call-screen');
+            const status = document.getElementById('call-status');
+            screen.style.display = 'flex';
+            status.innerText = "Calling " + phoneNum + "...";
+            setTimeout(() => { status.innerText = "Call Failed"; }, 3000);
+        }
+        function endCall() {
+            document.getElementById('call-screen').style.display = 'none';
+            phoneNum = "";
+            document.getElementById('phone-num').innerText = "";
+        }
+        const chats = [
+            { name: "Mom", char: "M", color: "#ff9ff3", msgs: [{t: "Don't forget dinner!", m: "them"}, {t: "I'll be there!", m: "me"}] },
+            { name: "Alex", char: "A", color: "#54a0ff", msgs: [{t: "Did you see the game?", m: "them"}, {t: "Yeah it was crazy!", m: "me"}, {t: "I can't believe that ending.", m: "them"}] },
+            { name: "Work", char: "W", color: "#5f27cd", msgs: [{t: "Meeting at 9am", m: "them"}] },
+        ];
+        function initMessagesApp() {
+            const list = document.getElementById('msg-list');
+            list.innerHTML = '';
+            chats.forEach((c, i) => {
+                const item = document.createElement('div');
+                item.className = 'msg-item';
+                item.innerHTML = `<div class="avatar" style="background:${c.color}">${c.char}</div>
+                                  <div class="msg-preview"><div class="msg-name">${c.name}</div><div class="msg-text">${c.msgs[c.msgs.length-1].t}</div></div>`;
+                item.onclick = () => openChat(i);
+                list.appendChild(item);
+            });
+        }
+        function openChat(idx) {
+            const c = chats[idx];
+            document.getElementById('chat-name').innerText = c.name;
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+            c.msgs.forEach(m => {
+                const b = document.createElement('div');
+                b.className = `bubble ${m.m}`;
+                b.innerText = m.t;
+                container.appendChild(b);
+            });
+            document.getElementById('chat-view').style.display = 'flex';
+        }
+        function closeChat() { document.getElementById('chat-view').style.display = 'none'; }
+        function safariGo() {
+            const text = document.getElementById('safari-text');
+            const loader = document.getElementById('safari-loader');
+            text.innerText = "Loading page...";
+            loader.style.display = 'block';
+            setTimeout(() => {
+                text.innerText = "Error 404: Page not found in XR-VM simulation.";
+                loader.style.display = 'none';
+            }, 4000);
+        }
+        let isPlaying = false;
+        function toggleSpotify() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('spot-play');
+            const art = document.getElementById('spotify-art');
+            btn.innerText = isPlaying ? "⏸" : "▶";
+            if (isPlaying) art.classList.add('rotating');
+            else art.classList.remove('rotating');
+        }
+        let touchStartY = 0;
+        const homeBar = document.getElementById('global-home-bar');
+        homeBar.addEventListener('mousedown', (e) => {
+            touchStartY = e.clientY;
+            const onMouseMove = (moveEvent) => {
+                const diff = touchStartY - moveEvent.clientY;
+                if (currentApp && currentApp !== 'about-app' && diff > 0) {
+                    const appEl = document.getElementById(currentApp);
+                    appEl.style.transition = 'none';
+                    appEl.style.transform = `translateY(-${diff}px)`;
+                }
+            };
+            const onMouseUp = (upEvent) => {
+                window.removeEventListener('mousemove', onMouseMove);
+                window.removeEventListener('mouseup', onMouseUp);
+                const diff = touchStartY - upEvent.clientY;
+                if (diff > 80) {
+                    closeCurrentApp();
+                } else if (currentApp && currentApp !== 'about-app') {
+                    const appEl = document.getElementById(currentApp);
+                    appEl.style.transition = 'transform 0.4s ease';
+                    appEl.style.transform = 'translateY(0)';
+                }
+            };
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+        });
+    </script>
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
